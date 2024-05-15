@@ -11,6 +11,7 @@ def mainmenu():
     print("8. Exit")
 while True:
     mainmenu()
+    loan_repository = LoanRepository.ILoanRepositoryImpl()
     choice=int(input("Enter your choice: "))
     if choice==1:
         loanID = input("Enter Loan ID: ")
@@ -22,26 +23,26 @@ while True:
         loanStatus = "Pending"
         
         loan = Loans(loanID, customerID, principalAmount, interestRate, loanTerm, loanType, loanStatus)
-        LoanRepository.applyLoan(loan)
+        loan_repository.applyLoan(loan)
     elif choice==2:
-        loneid=int(input("Enter the loanid: "))
-        LoanRepository.calculateInterest(loneid)
+        loanid=int(input("Enter the loanid: "))
+        loan_repository.calculateInterest(loanid)
     elif choice==3:
-        loneid=int(input("Enter the loanid: "))
-        LoanRepository.calculateEMI(loneid)
+        loanid=int(input("Enter the loanid: "))
+        loan_repository.calculateEMI(loanid)
     elif choice==4:
-        loneid=int(input("Enter the loanid: "))
-        LoanRepository.loanRepayment(loneid)
+        loanid=int(input("Enter the loanid: "))
+        loan_repository.loanRepayment(loanid)
     elif choice==5:
-        LoanRepository.getAllLoan()
+        loan_repository.getAllLoan()
     elif choice==6:
-        loneid=int(input("Enter the loanid: "))
-        LoanRepository.getLoanById(loneid)
+        loanid=int(input("Enter the loanid: "))
+        loan_repository.getLoanById(loanid)
     elif choice==7:
-        loneid=int(input("Enter the loneid: "))
-        LoanRepository.loanStatus(loneid)
+        loanid=int(input("Enter the loanid: "))
+        loan_repository.loanStatus(loanid)
     elif choice==8:
-        LoanRepository.close()
+        loan_repository.close()
         break
     else:
         print("Please enter the choice within range")

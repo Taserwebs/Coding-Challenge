@@ -7,8 +7,8 @@ class ILoanRepositoryImpl(ILoanRepository,DBConnection):
 
     def applyLoan(self, Loan):
         try:
-            self.cursor.execute("INSERT INTO  Loan (loanID, customerID, principalAmount, interestRate, loanTerm, loanType, loanStatus) VALUES (?,?,?,?,?,?,?)",
-                                (Loan.loanID,Loan.customerID, Loan.principalAmount, Loan.interestRate, Loan.loanTerm, Loan.loanType, Loan.loanStatus))
+            self.cursor.execute("INSERT INTO  Loans (LoanID, CustomerId, PrincipalAmount, InterestRate, LoanTerm, LoanType, LoanStatus) VALUES (?,?,?,?,?,?,?)",
+                                (Loan.LoanID,Loan.CustomerId, Loan.PrincipalAmount, Loan.InterestRate, Loan.LoanTerm, Loan.LoanType, Loan.LoanStatus))
             self.conn.commit()
         except Exception as e:
             self.conn.rollback()
@@ -16,7 +16,7 @@ class ILoanRepositoryImpl(ILoanRepository,DBConnection):
         
     def calculateInterest(self, LoanID):
         try:
-            self.cursor.execute("Select principalAmount,interestRate,loanTerm from Loan where LoanID=?",
+            self.cursor.execute("Select PrincipalAmount,InterestRate,LoanTerm from Loans where LoanID=?",
                                 (LoanID))
             result=self.cursor.fetchone()
             if result:
@@ -32,18 +32,18 @@ class ILoanRepositoryImpl(ILoanRepository,DBConnection):
         
     def loanStatus(self, loanId):
         try:
-            self.cursor.execute("Select credit_score from Loan l inner join  Customer c on c.customerID=l.customerID where loanID=?;",(loanId))
+            self.cursor.execute("Select CreditScore from Loans l inner join  Customers c on c.CustomerId=l.CustomerId where LoanId=?;",(loanId))
             result=self.cursor.fetchone()
             if result:
                 ##self.calculateInterest(result[0],result[1],result[2])
                 credit_score = result[0]
                 if credit_score>650:
                     print("Approved")
-                    self.cursor.execute("update Loan set loanStatus='Approved' where loanID=?;",(loanId))
+                    self.cursor.execute("update Loans set LoanStatus='Approved' where LoanId=?;",(loanId))
                     self.conn.commit()
                 else:
                     print("Rejected")
-                    self.cursor.execute("update Loan set loanStatus='Rejected' where loanID=?;",(loanId))
+                    self.cursor.execute("update Loans set LoanStatus='Rejected' where LoanId=?;",(loanId))
                     self.conn.commit()
             else:
                 raise InvalidLoanException("Loan not found")
@@ -51,16 +51,16 @@ class ILoanRepositoryImpl(ILoanRepository,DBConnection):
             self.conn.rollback()
             raise InvalidLoanException("Couldn't find customer/loan. Error: {}".format(str(e)))
         
-    def calculateEMI(self, loneId):
+    def calculateEMI(self, loanId):
         try:
-            self.cursor.execute("Select principalAmount,interestRate,loanTerm from Loan where LoanID=?",
-                                (loneId))            
+            self.cursor.execute("Select PrincipalAmount,InterestRate,LoanTerm from Loans where LoanId=?",
+                                (loanId))            
             result=self.cursor.fetchone()
             if result:
                 ##self.calculateInterest(result[0],result[1],result[2])
-                principalAmount, interestRate, loanTerm = result
-                R = interestRate / (12 * 100)
-                emi=(principalAmount*R*(1+R)**loanTerm)/((1+R)**loanTerm-1)
+                PrincipalAmount, InterestRate, LoanTerm = result
+                R = InterestRate / (12 * 100)
+                emi=(PrincipalAmount*R*(1+R)**LoanTerm)/((1+R)**LoanTerm-1)
                 print(f"The emi is {round(emi,2)}")
                 return emi
             else:
@@ -69,9 +69,9 @@ class ILoanRepositoryImpl(ILoanRepository,DBConnection):
             self.conn.rollback()
             raise InvalidLoanException("Couldn't find customer/loan. Error: {}".format(str(e)))
         
-    def loanRepayment(self,loneId,amount):
+    def loanRepayment(self,loanId,amount):
         try:
-            emi=self.calculateEMI(loneId)
+            emi=self.calculateEMI(loanId)
             loanRepaymentcount=0
             if emi:
                 if emi>amount:
@@ -90,7 +90,7 @@ class ILoanRepositoryImpl(ILoanRepository,DBConnection):
                 
     def getAllLoan(self):
         try:
-            self.cursor.execute("Select * from Loan")
+            self.cursor.execute("Select * from Loans")
             print(self.cursor.fetchall())
         except Exception as e:
             self.conn.rollback()
@@ -98,7 +98,7 @@ class ILoanRepositoryImpl(ILoanRepository,DBConnection):
         
     def getLoanById(self, loanId):
         try:
-            self.cursor.execute("Select * from Loan where loanID=?",(loanId))
+            self.cursor.execute("Select * from Loans where LoanId=?",(loanId))
             result=self.cursor.fetchall()
             if result:
                 print(result)
