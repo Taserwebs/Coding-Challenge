@@ -8,7 +8,7 @@ class ILoanRepositoryImpl(ILoanRepository,DBConnection):
     def applyLoan(self, Loan):
         try:
             self.cursor.execute("INSERT INTO  Loans (LoanID, CustomerId, PrincipalAmount, InterestRate, LoanTerm, LoanType, LoanStatus) VALUES (?,?,?,?,?,?,?)",
-                                (Loan.LoanID,Loan.CustomerId, Loan.PrincipalAmount, Loan.InterestRate, Loan.LoanTerm, Loan.LoanType, Loan.LoanStatus))
+                                (Loan.LoanId,Loan.CustomerId, Loan.PrincipalAmount, Loan.InterestRate, Loan.LoanTerm, Loan.LoanType, Loan.LoanStatus))
             self.conn.commit()
         except Exception as e:
             self.conn.rollback()
